@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,11 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
                                                                               ServerWebExchange exchange) {
         log.error(String.format("Error message: %s, response status: %d ",
                 ex, ex.getStatusCode().value()));
-        return Mono.just(new ResponseEntity<>(objectMapper.writeValueAsString(new ErrorResponseBody(ex.getStatusCode().value(), ex.getMessage()))
-                , ex.getStatusCode()));
+        return Mono.just(new ResponseEntity<>(
+                objectMapper
+                        .writeValueAsString(new ErrorResponseBody(
+                                ex.getStatusCode().value(),
+                                StringUtils.substringBetween(ex.getMessage(), "\""))),
+                ex.getStatusCode()));
     }
 }
