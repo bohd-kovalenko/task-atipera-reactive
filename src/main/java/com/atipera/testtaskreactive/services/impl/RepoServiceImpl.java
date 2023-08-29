@@ -2,7 +2,6 @@ package com.atipera.testtaskreactive.services.impl;
 
 
 import com.atipera.testtaskreactive.clients.GitHubRepoClient;
-import com.atipera.testtaskreactive.mappers.BranchesMapper;
 import com.atipera.testtaskreactive.models.GitHubRepositoryBranch;
 import com.atipera.testtaskreactive.payload.responses.BranchResponse;
 import com.atipera.testtaskreactive.services.RepoService;
@@ -23,6 +22,8 @@ public class RepoServiceImpl implements RepoService {
                 .extractBranchesInfoByRepositoryNameAndUsername(repoName, username);
         log.info(String.format("Performed branches extraction for %s repo", repoName));
         return branchesResponse
-                .map(branch -> BranchesMapper.INSTANCE.branchResponseToGitHubRepositoryBranch(branch));
+                .map(branch -> new GitHubRepositoryBranch(
+                        branch.name(),
+                        branch.lastCommit().sha()));
     }
 }

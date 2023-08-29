@@ -33,10 +33,15 @@ public class UserServiceImpl implements UserService {
                         response -> Mono.error(new UserNotFoundException("No such user on GitHub")))
                 .bodyToFlux(RepositoryResponse.class)
                 .filter(repository -> !repository.isFork())
-                .map(repository -> new GitHubRepository(
-                        repository.name(),
-                        repository.repositoryOwner().login(),
-                        repoService.extractAllRepoBranchesByNameAndUsername(repository.name(), username)
-                ));
+                .flatMap(repository ->
+                        repoService
+                                .extractAllRepoBranchesByNameAndUsername(repository.name(), username)
+                                .collectList()
+                                .map(branches -> new GitHubRepository(
+                                        repository.name(),
+                                        repository.repositoryOwner().login(),
+                                        branches
+                                ))
+                );
     }
 }
