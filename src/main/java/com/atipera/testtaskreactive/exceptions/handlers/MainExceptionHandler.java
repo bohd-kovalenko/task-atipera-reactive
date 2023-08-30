@@ -23,10 +23,11 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     private final ObjectMapper objectMapper;
 
     @ExceptionHandler(value = {UserNotFoundException.class})
-    public ResponseEntity<ErrorResponseBody> handleUserNotFoundException(UserNotFoundException e) {
+    public Mono<ResponseEntity<ErrorResponseBody>> handleUserNotFoundException(UserNotFoundException e) {
         log.error(String.format("Error message: %s, response status: %d ",
                 e.getMessage(), e.getStatusCode().value()));
-        return new ResponseEntity<>(new ErrorResponseBody(e), e.getStatusCode());
+        return Mono
+                .just(new ResponseEntity<>(new ErrorResponseBody(e), e.getStatusCode()));
     }
 
     @Override
